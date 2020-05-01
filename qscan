@@ -1,16 +1,43 @@
 #!/bin/bash
 
-nc -zvw1 $1 21 2>&1 | grep "open"
-nc -zvw1 $1 22 2>&1 | grep "open"
-nc -zvw1 $1 23 2>&1 | grep "open"
-nc -zvw1 $1 53 2>&1 | grep "open"
-nc -zvw1 $1 80 2>&1 | grep "open"
-nc -zvw1 $1 443 2>&1 | grep "open"
-nc -zvw1 $1 88 2>&1 | grep "open"
-nc -zvw1 $1 135 2>&1 | grep "open"
-nc -zvw1 $1 139 2>&1 | grep "open"
-nc -zvw1 $1 389 2>&1 | grep "open"
-nc -zvw1 $1 445 2>&1 | grep "open"
-nc -zvw1 $1 5985 2>&1 | grep "open"
-nc -zvw1 $1 5986 2>&1 | grep "open"
-nc -zvw1 $1 2049 2>&1 | grep "open"
+usage_short() {
+	echo "USAGE: qscan [ target hostname/ip ]"
+}
+
+usage() {
+
+	usage_short
+
+	echo -e "\nExamples:"
+	echo "qscan 10.10.10.13"
+	echo "qscan cronos.htb"
+}
+
+if [[ -z $1 ]]; then
+	usage_short
+	exit 1
+fi
+
+if [[ $1 = "-h" ]]; then
+	usage
+	exit 1
+fi
+
+scan() {
+	nc -zvw1 $1 $2 2>&1 | grep open
+}
+
+scan $1 21
+scan $1 22
+scan $1 23
+scan $1 53
+scan $1 80
+scan $1 443
+scan $1 88
+scan $1 135
+scan $1 139
+scan $1 389
+scan $1 445
+scan $1 5985
+scan $1 5986
+scan $1 2049

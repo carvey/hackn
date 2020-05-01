@@ -1,9 +1,29 @@
 #!/bin/bash
 
-usage() {
+usage_short() {
 	echo "USAGE: smbcrawl [ target ] -u [ username ] -p [ password ] -s [ share ]"
-	exit 1
 }
+
+usage() {
+	usage_short
+
+	echo -e "\nExamples:"
+	echo -e "\n# Use smbmap to print out the shares available on 10.10.10.100 with a specified user and password"
+	echo "smbcrawl 10.10.10.100 -u someuser -p password123"
+
+	echo -e "\n# Download all files under the Data share with specified credentials"
+	echo "smbcrawl 10.10.10.100 -u someuser -p password123 -s Data"
+}
+
+if [[ -z $1 ]]; then
+	usage_short
+	exit 1
+fi
+
+if [[ $1 = "-h" ]]; then
+	usage
+	exit 1
+fi
 
 HOST=$1
 shift 1
@@ -27,6 +47,7 @@ do
 		: ) 
 			echo "ERROR: -$OPTARG requires an argument"
 			usage
+			exit 1
 			;;
 		h) 
 			usage
@@ -38,6 +59,7 @@ done
 
 if [[ $OPTINDS -eq 1 ]]; then
 	usage
+	exit
 fi
 
 if [[ -z $USER ]]; then

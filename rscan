@@ -11,9 +11,13 @@ action=$2
 # -r to run the scan or -c to copy to clipboard
 run_copy=$3
 
+usage_short() {
+	echo "USAGE: rscan [ target ip/hostname ] [ scanning action ] [ optional action ]"
+}
+
 usage() {
 
-	echo "USAGE: rscan [ target ip/hostname ] [ scanning action ] [ optional action ]"
+	usage_short
 
 	echo -e "\nScripts to run include:"
 	echo "    nmap -> Do a full nmap scan of the designated host"
@@ -37,7 +41,7 @@ usage() {
 }
 
 if [[ -z $1 ]]; then
-	usage
+	usage_short
 fi
 
 if [[ $1 = "-h" ]]; then

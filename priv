@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# this script really just copies things for me that I use often
+# without all the typing. It's just a fancy alias
+
+usage_short() {
+	echo "USAGE: priv [ type ]"
+}
+
 type=$1
 pull=$2
 
