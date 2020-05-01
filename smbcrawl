@@ -1,0 +1,66 @@
+#!/bin/bash
+
+usage() {
+	echo "USAGE: smbcrawl [ target ] -u [ username ] -p [ password ] -s [ share ]"
+	exit 1
+}
+
+HOST=$1
+shift 1
+
+while getopts :u:p:hs: option
+do
+	case "${option}" in
+		u) 
+			USER=${OPTARG}
+			;;
+		p) 
+			PASS=${OPTARG}
+			;;
+		s) 
+			SHARE=${OPTARG}
+			;;
+		\?) 
+			echo "ERROR: Invalid option -$OPTARG"
+			usage 
+			;;
+		: ) 
+			echo "ERROR: -$OPTARG requires an argument"
+			usage
+			;;
+		h) 
+			usage
+			exit 1
+			;;
+
+	esac
+done
+
+if [[ $OPTINDS -eq 1 ]]; then
+	usage
+fi
+
+if [[ -z $USER ]]; then
+	USER='""'
+fi
+
+if [[ -z $PASS ]]; then
+	PASS='""'
+fi
+
+if [[ -z $SHARE ]]; then
+	echo "WARNING: Select a share to crawl with -s [ share ]"
+	echo
+	echo "Shares available with credentials $USER:$PASS"
+	smbmap -H $HOST -u $USER -p $PASS
+	exit 1
+fi
+
+
+echo "SEARCHING    \\\\$HOST\\$SHARE with $USER:$PASS"
+echo
+smbclient -U "$USER%$PASS" -c 'prompt OFF;recurse ON;mget *' \\\\$HOST\\$SHARE
+if [ ! $? -eq 0 ]; then
+	exit 1
+fi
+

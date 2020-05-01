@@ -1,0 +1,87 @@
+#!/bin/bash
+
+# Note: for simplicity and ease of typing this script uses positional parameters only! Don't pass in mixued up arguments!
+
+# target is the ip/hostname of the machine to scan
+target=$1
+
+# action is the name of the scan to run
+action=$2
+
+# -r to run the scan or -c to copy to clipboard
+run_copy=$3
+
+usage() {
+
+	echo "USAGE: rscan [ target ip/hostname ] [ scanning action ] [ optional action ]"
+
+	echo -e "\nScripts to run include:"
+	echo "    nmap -> Do a full nmap scan of the designated host"
+	echo "    dirs -> Use gobuster to run a directory scan of the designated webserver"
+	echo "    subdomains -> Use wfuzz to run a subdomain scan. Note: You need to have a domain name for this! Don't just use with -r without checking the Host header!"
+
+	echo -e "\nOptional actions include:"
+	echo "    -r to run the command"
+	echo "    -c to copy the command to your clipboard"
+	echo "    Blank values will print out your command"
+
+	echo -e "\nExamples:"
+	echo "# to print out the full nmap command"
+	echo "rscan 10.10.10.13 nmap"
+	echo -e "\n# to run gobuster"
+	echo "rscan 10.10.10.13 dirs -r"
+	echo -e "\n# to copy wfuzz command to clipboard"
+	echo "rscan 10.10.10.13 dirs -c"
+	echo -e "\n# to scan for subdomains"
+	echo "rscan cronos.htb subdomains -r"
+}
+
+if [[ -z $1 ]]; then
+	usage
+fi
+
+if [[ $1 = "-h" ]]; then
+	usage
+fi
+
+# scan_cmd will actually print, run, or copy the command
+# Parameters:
+# $1 = entire command to include parameters
+# $2 = -r for run or -c for copy to clipboard
+scan_cmd() {
+
+	if [[ $2 = "-r" ]]; then
+		echo "$1"
+		eval "$1"
+
+	elif [[ $2 = "-c" ]]; then
+		echo -n "$1" | xclip -selection c
+
+	elif [[ -z "$2" ]]; then
+		echo "$1"
+	fi
+}
+
+# define the commands
+# the first one is commented and the rest follow the same exact pattern
+if [[ $action = "nmap" ]]; then # if the user specified 'nmap' then only run this action
+
+	# define the command and pass in the ip/hostname at the end for convenience
+	cmd="sudo nmap -sC -sV -sT -A -T4 -A -v -o nmap-out.txt -p- $target"
+
+	# pass the command string to scan_cmd to print, run, or copy it
+	scan_cmd "$cmd" $3
+
+elif [[ $action = "gobuster" ]]; then
+	cmd="gobuster dir -o gobuster-out.txt -w /usr/share/wordlists/dirb/common.txt -s 200,204,301,302,307,403,500 -p http://localhost:8080 -e -x php,html,py,txt -u http://$target"
+	scan_cmd "$cmd" $3
+
+elif [[ $action = "subdomains" ]]; then
+	cmd="wfuzz -w /usr/share/wordlists/dirb/common.txt -H 'Host: FUZZ.$target' -Z -L --oF domain-scan $target"
+	scan_cmd "$cmd" $3
+
+# more commands can be added here
+# to add a command, copy and paste the elif, cmd, and scan_cmd lines from a command above and edit them below
+# don't forget to add the new command to the help section at the top
+
+fi

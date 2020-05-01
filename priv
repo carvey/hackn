@@ -1,0 +1,47 @@
+#!/bin/bash
+
+type=$1
+pull=$2
+
+if [ $type = "lin" ]; then
+	if [[ $pull = "pull" ]]; then
+		git -C "/home/kali/tools/privilege-escalation-awesome-scripts-suite/" pull
+		git -C "/home/kali/tools/LinEnum/" pull
+	fi
+
+	cp /home/kali/tools/privilege-escalation-awesome-scripts-suite/linPEAS/linpeas.sh .
+	cp /home/kali/tools/LinEnum/LinEnum.sh linenum.sh
+
+elif [ $type = "win" ]; then
+	if [[ $pull = "pull" ]]; then
+		git -C "/home/kali/tools/privilege-escalation-awesome-scripts-suite/" pull
+	fi
+
+	cp /home/kali/tools/privilege-escalation-awesome-scripts-suite/winPEAS/winPEASexe/winPEAS/bin/x86/Release/winPEAS.exe winPEASx86.exe
+	cp /home/kali/tools/privilege-escalation-awesome-scripts-suite/winPEAS/winPEASexe/winPEAS/bin/x64/Release/winPEAS.exe winPEASx64.exe
+	cp /home/kali/tools/privilege-escalation-awesome-scripts-suite/winPEAS/winPEASbat/winPEAS.bat .
+
+elif [ $type = "up" ]; then
+	cp /usr/share/windows-resources/PowerSploit/Privesc/PowerUp.ps1 .
+
+elif [ $type = "view" ]; then
+	cp /usr/share/windows-resources/PowerSploit/Recon/PowerView.ps1 .
+
+elif [ $type = "sharp" ]; then
+	cp /usr/share/windows-resources/sharphound/SharpHound.exe .
+
+elif [ $type = "socat" ]; then
+	cp $(which socat) .
+
+elif [ $type = "catz" ]; then
+	cp /usr/share/windows-resources/mimikatz/x64/mimikatz.exe .
+
+elif [[ $type = "list" || $type = "-h" ]]; then
+	echo "lin -> linpeas.sh and LinEnum.sh"
+	echo "win -> winPEASx86.exe, winPEASx64.exe, and winPEAS.bat"
+	echo "up -> PowerUp.ps1"
+	echo "view -> PowerView.ps1"
+	echo "sharp -> SharpHound.exe"
+	echo "socat -> socat"
+	echo "catz -> mimikatz.exe"
+fi
